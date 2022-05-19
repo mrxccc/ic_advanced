@@ -1,9 +1,9 @@
 import Nat "mo:base/Nat";
 import Logger "mo:ic-logger/Logger";
 
-actor class MyLogger() {
+actor class MyLogger(n : ?Nat) {
 
-  stable var state : Logger.State<Text> = Logger.new<Text>(0, null);
+  stable var state : Logger.State<Text> = Logger.new<Text>(0, n);
   let logger = Logger.Logger<Text>(state);
 
   // Add a set of messages to the log.

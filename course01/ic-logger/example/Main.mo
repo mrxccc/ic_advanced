@@ -22,9 +22,8 @@ actor class Main() {
                 if(size < 100){
                     await _curLogger.append(msgs);
                 } else {
-                    let newLogger: MyLogger = await MyLoggers.MyLogger();
+                    var newLogger: MyLogger = await MyLoggers.MyLogger(?8);
                     await newLogger.append(msgs);
-                    logger_index += 1;
                     Bs.put(logger_index, newLogger);
                 }
              };
