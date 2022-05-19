@@ -13,7 +13,6 @@ actor class Main() {
     private stable var logger_index : Nat = 0;
     private let Bs = RBT.RBTree<Nat, MyLogger>(Nat.compare); //存储创建的canister
     type MyLogger = MyLoggers.MyLogger;
-    type View = Logger.View<Text>;
     // Add a set of messages to the log.
     public shared (msg) func append(msgs: [Text]): async () {
         let curLogger : ?MyLogger  = Bs.get(logger_index);
@@ -35,18 +34,16 @@ actor class Main() {
     };
 
   // Return the messages between from and to indice (inclusive).
-  public shared query (msg) func view(from: Nat, to: Nat) : async View {
+  public shared (msg) func view(from: Nat, to: Nat) : async Logger.View<Text> {
     let curLogger : ?MyLogger  = Bs.get(logger_index);
     switch (curLogger) {
         case (?_curLogger) { 
             await _curLogger.view(from, to);
          };
         case null {
-            var messages : List.List<Text> = List.nil();
-            var start_index : Nat = 0;
-            let l = {
-                start_index: start_index;
-                messages: messages;
+            {
+                start_index : Nat = 0;
+                messages = [""];
             }
          };
     };
