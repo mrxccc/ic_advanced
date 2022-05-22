@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "dfx": "0.8.4",
+  "canisters": {
+    "course02": {
+      "type": "motoko",
+      "main": "src/course02/main.mo"
+    },
+    "course02_assets": {
+      "type": "assets",
+      "source": [
+        "src/course02_assets/assets"
+      ],
+      "dependencies": [
+        "course02"
+      ]
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    }
+  }
+}
