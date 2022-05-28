@@ -8,33 +8,29 @@ module {
 	public type  ID = Nat;
 
 	public type Proposal = {
-		id: ID;
-		proposer: Owner;
-		wasm_code:  ?Blob; // valid only for install code type
-		ptype: ProposalType;
-		canister_id:  ?Canister; // can be null only for create canister case
-		approvers: [Owner];
-		finished: Bool;
+		id: ID; // 提案id
+		proposer: Owner; // 提案发起者
+		ptype: ProposalType; // 提案类型
+		canisterId: Canister; // 提案指定的canister_id
+		approvers: [Owner]; // 提案同意成员
+		finished: Bool; // 提案完成状态
+		targetOwner: Owner; // 需要限制权限/加入权限的Owner
 	};
 
 	public type ProposalType = {
-		#installCode;
-		#uninstallCode;
-		#createCanister;
-		#startCanister;
-		#stopCanister;
-		#deleteCanister;
+		#restrictPermissions;
+		#accessRestriction;
 	};
 
 	public func finish_proposer(p1: Proposal) : Proposal {
 		{
 			id = p1.id;
 			proposer = p1.proposer;
-			wasm_code = p1.wasm_code;
 			ptype = p1.ptype;
-			canister_id = p1.canister_id;
+			canisterId = p1.canisterId;
 			approvers = p1.approvers;
 			finished = true;
+			targetOwner = p1.targetOwner;
   		}
 	};
 
@@ -42,11 +38,11 @@ module {
 		{
 			id = p1.id;
 			proposer = p1.proposer;
-			wasm_code = p1.wasm_code;
 			ptype = p1.ptype;
-			canister_id = p1.canister_id;
+			canisterId = p1.canisterId;
 			approvers = Array.append(p1.approvers, [approver]);
 			finished = p1.finished;
+			targetOwner = p1.targetOwner;
   		}
 	};
 
@@ -54,11 +50,11 @@ module {
 		{
 			id = p1.id;
 			proposer = p1.proposer;
-			wasm_code = p1.wasm_code;
 			ptype = p1.ptype;
-			canister_id = ?id;
+			canisterId = id;
 			approvers = p1.approvers;
 			finished = p1.finished;
+			targetOwner = p1.targetOwner;
 		}
 	};
 }
