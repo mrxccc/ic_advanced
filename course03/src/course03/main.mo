@@ -29,7 +29,7 @@ actor class() = self {
     public type MyPropose = actor {
         removeOwner : shared(owner : Owner) -> async (); // 移除Owner
         appendOwner : shared(owner : Owner) -> async (); // 添加Owner
-        init : shared(list : [Owner], m : Nat) -> async Nat; // 添加Owner
+        init : shared(list : [Owner], m : Nat) -> async Nat; // 初始化Owner
     };
 
     // 发起提案
