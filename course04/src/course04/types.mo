@@ -11,7 +11,6 @@ module {
 		id: ID; // 提案id
 		proposer: Owner; // 提案发起者
 		wasm_code:  ?Blob; // 如果是installCode,才有值
-		wasm_code_hash: [Nat8];
 		ptype: ProposalType; // 提案类型
 		canisterId: ?Canister; // 提案指定的canister_id，如果是installCode或者upgradeCode，为空
 		approvers: [Owner]; // 提案同意成员
@@ -21,8 +20,8 @@ module {
 	};
 
 	public type ProposalType = {
-		#restrictPermissions;
-		#accessRestriction;
+		#addPermission;
+		#removePermission;
 		#installCode;
 		#upgradeCode;
 		#uninstallCode;
@@ -37,13 +36,12 @@ module {
 			id = p1.id;
 			proposer = p1.proposer;
 			wasm_code = p1.wasm_code;
-			wasm_code_hash = p1.wasm_code_hash;
 			ptype = p1.ptype;
 			canisterId = p1.canisterId;
 			approvers = p1.approvers;
 			refusers = p1.refusers;
 			finished = true;
-			description = p1.description
+			description = p1.description;
   		}
 	};
 
@@ -52,30 +50,26 @@ module {
 			id = p1.id;
 			proposer = p1.proposer;
 			wasm_code = p1.wasm_code;
-			wasm_code_hash = p1.wasm_code_hash;
 			ptype = p1.ptype;
 			canisterId = p1.canisterId;
 			approvers = Array.append(p1.approvers, [approver]);
             refusers = p1.refusers;
 			finished = p1.finished;
-			description = p1.description
+			description = p1.description;
   		}
 	};
 
-	public func add_approver(p1: Proposal, approver: Owner) : Proposal {
+	public func add_refuser(p1: Proposal, refuser: Owner) : Proposal {
 		{
 			id = p1.id;
 			proposer = p1.proposer;
 			wasm_code = p1.wasm_code;
-			wasm_code_hash = p1.wasm_code_hash;
 			ptype = p1.ptype;
 			canisterId = p1.canisterId;
-			approvers = Array.append(p1.approvers, [approver]);
 			approvers = p1.approvers;
             refusers = Array.append(p1.refusers, [refuser]);
-			refusers = p1.refusers;
 			finished = p1.finished;
-			description = p1.description
+			description = p1.description;
   		}
 	};
 
@@ -84,13 +78,12 @@ module {
 			id = p1.id;
 			proposer = p1.proposer;
 			wasm_code = p1.wasm_code;
-			wasm_code_hash = p1.wasm_code_hash;
 			ptype = p1.ptype;
-			canisterId = id;
+			canisterId = ?id;
 			approvers = p1.approvers;
 			refusers = p1.refusers;
 			finished = p1.finished;
-			description = p1.description
+			description = p1.description;
 		}
 	};
 }

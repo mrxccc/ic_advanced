@@ -1,41 +1,50 @@
-type canister_id = principal;
-type anon_class_13_1 = 
+type anon_class_15_1 = 
  service {
-   appendOwner: (Owner__1) -> ();
-   create_canister: () -> (canister_id);
-   delete_canister: (principal) -> ();
+   get_model: () -> (nat, nat) query;
    get_owned_canisters_list: () -> (vec Canister__1) query;
    get_owner_list: () -> (vec Owner__1) query;
+   get_permission: (Canister__1) -> (opt bool) query;
    get_proposal: (ID) -> (opt Proposal) query;
-   get_proposal_list: (ID) -> (vec Proposal) query;
-   init: (vec Owner__1, nat) -> (nat);
-   install_code: (principal, opt blob) -> ();
-   propose: (ProposalType__1, Canister__1, Owner__1, text) -> (Proposal);
-   removeOwner: (Owner__1) -> ();
-   start_canister: (principal) -> ();
-   stop_canister: (principal) -> ();
+   get_proposals: () -> (vec Proposal) query;
+   propose: (ProposalType__1, opt Canister__1, opt blob, text) -> (Proposal);
+   refuse: (ID) -> (Proposal);
    vote: (ID) -> (Proposal);
  };
 type ProposalType__1 = 
  variant {
-   accessRestriction;
-   restrictPermissions;
+   addPermission;
+   createCanister;
+   deleteCanister;
+   installCode;
+   removePermission;
+   startCanister;
+   stopCanister;
+   uninstallCode;
+   upgradeCode;
  };
 type ProposalType = 
  variant {
-   accessRestriction;
-   restrictPermissions;
+   addPermission;
+   createCanister;
+   deleteCanister;
+   installCode;
+   removePermission;
+   startCanister;
+   stopCanister;
+   uninstallCode;
+   upgradeCode;
  };
 type Proposal = 
  record {
    approvers: vec Owner;
-   canisterId: Canister;
+   canisterId: opt Canister;
    description: text;
    finished: bool;
    id: ID__1;
    proposer: Owner;
    ptype: ProposalType;
-   targetOwner: Owner;
+   refusers: vec Owner;
+   wasm_code: opt blob;
  };
 type Owner__1 = principal;
 type Owner = principal;
@@ -43,4 +52,4 @@ type ID__1 = nat;
 type ID = nat;
 type Canister__1 = principal;
 type Canister = principal;
-service : () -> anon_class_13_1
+service : (nat, vec Owner) -> anon_class_15_1

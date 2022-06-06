@@ -7,40 +7,47 @@ export type Owner = Principal;
 export type Owner__1 = Principal;
 export interface Proposal {
   'id' : ID__1,
+  'refusers' : Array<Owner>,
   'description' : string,
   'finished' : boolean,
   'proposer' : Owner,
-  'targetOwner' : Owner,
   'ptype' : ProposalType,
   'approvers' : Array<Owner>,
-  'canisterId' : Canister,
+  'wasm_code' : [] | [Array<number>],
+  'canisterId' : [] | [Canister],
 }
-export type ProposalType = { 'restrictPermissions' : null } |
-  { 'accessRestriction' : null };
-export type ProposalType__1 = { 'restrictPermissions' : null } |
-  { 'accessRestriction' : null };
-export interface anon_class_13_1 {
-  'appendOwner' : (arg_0: Owner__1) => Promise<undefined>,
-  'create_canister' : () => Promise<canister_id>,
-  'delete_canister' : (arg_0: Principal) => Promise<undefined>,
+export type ProposalType = { 'stopCanister' : null } |
+  { 'upgradeCode' : null } |
+  { 'addPermission' : null } |
+  { 'installCode' : null } |
+  { 'uninstallCode' : null } |
+  { 'startCanister' : null } |
+  { 'removePermission' : null } |
+  { 'createCanister' : null } |
+  { 'deleteCanister' : null };
+export type ProposalType__1 = { 'stopCanister' : null } |
+  { 'upgradeCode' : null } |
+  { 'addPermission' : null } |
+  { 'installCode' : null } |
+  { 'uninstallCode' : null } |
+  { 'startCanister' : null } |
+  { 'removePermission' : null } |
+  { 'createCanister' : null } |
+  { 'deleteCanister' : null };
+export interface anon_class_15_1 {
+  'get_model' : () => Promise<[bigint, bigint]>,
   'get_owned_canisters_list' : () => Promise<Array<Canister__1>>,
   'get_owner_list' : () => Promise<Array<Owner__1>>,
+  'get_permission' : (arg_0: Canister__1) => Promise<[] | [boolean]>,
   'get_proposal' : (arg_0: ID) => Promise<[] | [Proposal]>,
-  'get_proposal_list' : (arg_0: ID) => Promise<Array<Proposal>>,
-  'init' : (arg_0: Array<Owner__1>, arg_1: bigint) => Promise<bigint>,
-  'install_code' : (arg_0: Principal, arg_1: [] | [Array<number>]) => Promise<
-      undefined
-    >,
+  'get_proposals' : () => Promise<Array<Proposal>>,
   'propose' : (
       arg_0: ProposalType__1,
-      arg_1: Canister__1,
-      arg_2: Owner__1,
+      arg_1: [] | [Canister__1],
+      arg_2: [] | [Array<number>],
       arg_3: string,
     ) => Promise<Proposal>,
-  'removeOwner' : (arg_0: Owner__1) => Promise<undefined>,
-  'start_canister' : (arg_0: Principal) => Promise<undefined>,
-  'stop_canister' : (arg_0: Principal) => Promise<undefined>,
+  'refuse' : (arg_0: ID) => Promise<Proposal>,
   'vote' : (arg_0: ID) => Promise<Proposal>,
 }
-export type canister_id = Principal;
-export interface _SERVICE extends anon_class_13_1 {}
+export interface _SERVICE extends anon_class_15_1 {}
