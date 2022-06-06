@@ -35,6 +35,7 @@ export type ProposalType__1 = { 'stopCanister' : null } |
   { 'createCanister' : null } |
   { 'deleteCanister' : null };
 export interface anon_class_15_1 {
+  'getCanister' : () => Promise<Principal>,
   'get_model' : () => Promise<[bigint, bigint]>,
   'get_owned_canisters_list' : () => Promise<Array<Canister__1>>,
   'get_owner_list' : () => Promise<Array<Owner__1>>,
@@ -49,5 +50,6 @@ export interface anon_class_15_1 {
     ) => Promise<Proposal>,
   'refuse' : (arg_0: ID) => Promise<Proposal>,
   'vote' : (arg_0: ID) => Promise<Proposal>,
+  'whoami' : () => Promise<Principal>,
 }
 export interface _SERVICE extends anon_class_15_1 {}

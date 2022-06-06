@@ -1,24 +1,29 @@
 <template>
-    <div>
-        <a-tabs v-model:activeKey="activeKey" :style="{ background: '#85b4b6c2', padding: '24px'}"  @change="changeTabs">
-            <a-tab-pane key="1" tab="提案列表">
-                <a-button type="primary" @click="getProposals" :loading="proposalsLoading" style="margin: 10px">刷新</a-button>
-                <a-button type="primary" @click="newProposals" :loading="canistersLoading" style="margin: 10px">新增提案</a-button>
-                <a-table :columns="proposalsColumns" :data-source="data.proposalData" bordered class="ant-table-striped"></a-table>
-            </a-tab-pane>
-            <a-tab-pane key="2" tab="canister列表">
-                <a-button type="primary" @click="getCanisters" :loading="canistersLoading" style="margin: 10px">刷新</a-button>
-                <a-table :columns="canistersColumns" :data-source="data.canisterData" bordered class="ant-table-striped"></a-table>
-            </a-tab-pane>
-            <a-tab-pane key="3" tab="小组成员" force-render>
-                <a-button type="primary" @click="getOwnerList" :loading="ownersLoading" style="margin: 10px">刷新</a-button>
-                <a-table :columns="ownersColumns" :data-source="data.ownerData" bordered class="ant-table-striped"></a-table>
-            </a-tab-pane>
-            <template #rightExtra>
-                <a-button @click="login" type="primary" class="tabs-extra-demo-button">登录</a-button>
-            </template>
-        </a-tabs>
-    </div>
+    
+    <a-button @click="login" type="primary" class="tabs-extra-demo-button">登录</a-button>
+    <a-descriptions title="User Info">
+        <a-descriptions-item label="pic">{{data.pid}}</a-descriptions-item>
+        <a-descriptions-item label="cid">{{data.cid}}</a-descriptions-item>
+    </a-descriptions>
+    <a-tabs v-model:activeKey="activeKey" :style="{ background: '#85b4b6c2', padding: '24px'}"  @change="changeTabs">
+        <a-tab-pane key="1" tab="提案列表">
+            <a-button type="primary" @click="getProposals" :loading="proposalsLoading" style="margin: 10px">刷新</a-button>
+            <a-button type="primary" @click="newProposals" :loading="canistersLoading" style="margin: 10px">新增提案</a-button>
+            <a-table :columns="proposalsColumns" :data-source="data.proposalData" bordered class="ant-table-striped"></a-table>
+        </a-tab-pane>
+        <a-tab-pane key="2" tab="canister列表">
+            <a-button type="primary" @click="getCanisters" :loading="canistersLoading" style="margin: 10px">刷新</a-button>
+            <a-table :columns="canistersColumns" :data-source="data.canisterData" bordered class="ant-table-striped"></a-table>
+        </a-tab-pane>
+        <a-tab-pane key="3" tab="小组成员" force-render>
+            <a-button type="primary" @click="getOwnerList" :loading="ownersLoading" style="margin: 10px">刷新</a-button>
+            <a-table :columns="ownersColumns" :data-source="data.ownerData" bordered class="ant-table-striped"></a-table>
+        </a-tab-pane>
+        
+        <template #rightExtra>
+            <a-button @click="login" type="primary" class="tabs-extra-demo-button">登录</a-button>
+        </template>
+    </a-tabs>
 </template>
 
 <script>
@@ -26,14 +31,14 @@ import { course04 } from "../../declarations/course04";
 import { onMounted,reactive,ref  } from "vue";
 import { Principal } from "@dfinity/principal";
 import { AuthClient } from "@dfinity/auth-client";
+import { Actor, Identity } from "@dfinity/agent";
 
 export default {
     setup () {
-        const authClient = AuthClient.create();
         const canistersLoading = ref(false);
         const ownersLoading = ref(false);
         const proposalsLoading = ref(false);
-        const myPrincipal = ref('')
+        const authClient= reactive({});
         const canistersColumns = [
           {
             title: 'canisterId',
@@ -85,6 +90,10 @@ export default {
             canisterData: [],
             ownerData: [],
             proposalData: [],
+            login_index: 0,
+            pid: '',
+            cid: '',
+            authClient: {}
         });
         const methods = {
             fetchUserInfo(){
@@ -133,14 +142,33 @@ export default {
                     proposalsLoading.value = false
                 });
             },
-            login() {
-                authClient.login({
-                    identityProvider: "https://identity.ic0.app/",
-                    onSuccess: () => {
-                        const identity = authClient.getIdentity()
-                        myPrincipal = identity.getPrincipal().toText()
-                    }
-                });
+            // 登录
+            async login() {
+                const days = BigInt(1);
+                const hours = BigInt(24);
+                const nanoseconds = BigInt(3600000000000);
+                authClient.authClient.login(
+                    {
+                        onSuccess: async () => {
+                            const identity = authClient.getIdentity();
+                            data.pid = identity.getPrincipal().toText()
+                        },
+                    // identityProvider:process.env.DFX_NETWORK === "ic" ? "https://identity.ic0.app/#authorize": //线上internet identity canister ID
+                    // "http://rrkah-fqaaa-aaaaa-aaaaq-cai.localhost:8000/#authorize",//本地internet identity canister ID
+                    identityProvider: "https://identity.ic0.app/#authorize",//本地internet identity canister ID
+                    //最大授权有效期为8天
+                    maxTimeToLive: days * hours * nanoseconds,
+                }).then((res) => {
+
+                })
+                data.login_index = 1;
+            },
+            logout() {
+                authClient.authClient.logout().then(() => {
+                    data.pid = "";
+                    data.cid = "";
+                    login_index = 0;
+                })
             },
             // 新增提案
             newProposals(){
@@ -160,9 +188,11 @@ export default {
                 }
             }
         };
-        onMounted(() => {
+        onMounted(async () => {
             // 初始化canisters
             methods.getCanisters()
+            const ac = await AuthClient.create();
+            authClient.authClient = ac
         });
         return {
             ...methods,data,canistersLoading,ownersLoading,proposalsLoading,canistersColumns,ownersColumns,proposalsColumns,activeKey

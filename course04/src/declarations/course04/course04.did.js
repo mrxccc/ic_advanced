@@ -39,6 +39,7 @@ export const idlFactory = ({ IDL }) => {
     'deleteCanister' : IDL.Null,
   });
   const anon_class_15_1 = IDL.Service({
+    'getCanister' : IDL.Func([], [IDL.Principal], []),
     'get_model' : IDL.Func([], [IDL.Nat, IDL.Nat], ['query']),
     'get_owned_canisters_list' : IDL.Func(
         [],
@@ -61,6 +62,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'refuse' : IDL.Func([ID], [Proposal], []),
     'vote' : IDL.Func([ID], [Proposal], []),
+    'whoami' : IDL.Func([], [IDL.Principal], ['query']),
   });
   return anon_class_15_1;
 };

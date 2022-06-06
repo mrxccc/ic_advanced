@@ -82,14 +82,6 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         proposal;
     };
 
-    // 除了限权、解除限权、创建canister之外的权限判断
-    func is_canister_ops_need_no_permission(p: Proposal) : Bool {
-        Option.isSome(p.canisterId) and canisterPermissions.get(Option.unwrap(p.canisterId)) == ?false
-        and p.ptype != #addPermission 
-        and p.ptype != #removePermission 
-        and p.ptype != #createCanister
-    };
-
     // 对提案进行投票
     public shared (msg) func vote(id: ID) : async Proposal {
         // 消息调用者是否属于小组成员
@@ -229,6 +221,15 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         proposals.get(id)
     };
 
+    
+    // 除了限权、解除限权、创建canister之外的权限判断
+    func is_canister_ops_need_no_permission(p: Proposal) : Bool {
+        Option.isSome(p.canisterId) and canisterPermissions.get(Option.unwrap(p.canisterId)) == ?false
+        and p.ptype != #addPermission 
+        and p.ptype != #removePermission 
+        and p.ptype != #createCanister
+    };
+
     func owner_check(owner : Owner) : Bool {
         Option.isSome(Array.find(ownerList, func (a: Owner) : Bool { Principal.equal(a, owner) }))
     };
@@ -259,5 +260,15 @@ actor class(m: Nat, list: [Types.Owner]) = self {
 
     public query func get_permission(id: Canister) : async ?Bool {
         canisterPermissions.get(id)
+    };
+
+    public shared query ({caller}) func whoami() : async Principal
+    {
+       caller
+    };
+
+    public shared ({caller}) func getCanister() : async Principal
+    {
+         Principal.fromActor(self);
     };
 };
