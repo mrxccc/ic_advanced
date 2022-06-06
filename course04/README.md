@@ -1,8 +1,9 @@
 # course04
 
-示例：
+# 示例：
 ![图片](img/1654528987500.jpg)
 
+# deploy命令
 cd7qk-my6ce-anlh6-7wlh5-lw5ry-3ml6o-sjoqg-24cdj-fbryj-7sug2-cqe
 vsyhq-akc5g-dv6r5-egp32-ylr2k-whhrg-acmem-6tn5d-hd5pk-bnnix-gae
 bjzn2-6c7qz-bxshs-njhqu-gfkjv-prktq-bzols-4jgio-f2kii-hfczr-5qe
