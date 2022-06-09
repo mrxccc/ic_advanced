@@ -1,0 +1,57 @@
+type anon_class_15_1 = 
+ service {
+   getCanister: () -> (principal);
+   get_model: () -> (nat, nat) query;
+   get_owned_canisters_list: () -> (vec Canister__1) query;
+   get_owner_list: () -> (vec Owner__1) query;
+   get_permission: (Canister__1) -> (opt bool) query;
+   get_proposal: (ID) -> (opt Proposal) query;
+   get_proposals: () -> (vec Proposal) query;
+   propose: (ProposalType__1, opt Canister__1, opt blob, text) -> (Proposal);
+   refuse: (ID) -> (Proposal);
+   vote: (ID) -> (Proposal);
+   whoami: () -> (principal) query;
+ };
+type ProposalType__1 = 
+ variant {
+   addPermission;
+   createCanister;
+   deleteCanister;
+   installCode;
+   removePermission;
+   startCanister;
+   stopCanister;
+   uninstallCode;
+   upgradeCode;
+ };
+type ProposalType = 
+ variant {
+   addPermission;
+   createCanister;
+   deleteCanister;
+   installCode;
+   removePermission;
+   startCanister;
+   stopCanister;
+   uninstallCode;
+   upgradeCode;
+ };
+type Proposal = 
+ record {
+   approvers: vec Owner;
+   canisterId: opt Canister;
+   description: text;
+   finished: bool;
+   id: ID__1;
+   proposer: Owner;
+   ptype: ProposalType;
+   refusers: vec Owner;
+   wasm_code: opt blob;
+ };
+type Owner__1 = principal;
+type Owner = principal;
+type ID__1 = nat;
+type ID = nat;
+type Canister__1 = principal;
+type Canister = principal;
+service : (nat, vec Owner) -> anon_class_15_1
