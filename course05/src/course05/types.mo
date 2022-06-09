@@ -4,7 +4,11 @@ import Principal "mo:base/Principal";
 import Text "mo:base/Text";
 module {
 	public type Owner = Principal;
-	public type Canister = Principal;
+	public type CanisterStatus = { #stopped; #stopping; #running };
+	public type Canister = {
+		id: Principal;
+		status: CanisterStatus;
+	};
 	public type  ID = Nat;
 
 	public type Proposal = {
@@ -12,7 +16,7 @@ module {
 		proposer: Owner; // 提案发起者
 		wasm_code:  ?Blob; // 如果是installCode,才有值
 		ptype: ProposalType; // 提案类型
-		canisterId: ?Canister; // 提案指定的canister_id，如果是installCode或者upgradeCode，为空
+		canisterId: ?Principal; // 提案指定的canister_id，如果是installCode或者upgradeCode，为空
 		approvers: [Owner]; // 提案同意成员
 		refusers: [Owner]; // 提案拒绝成员
 		finished: Bool; // 提案完成状态
@@ -23,12 +27,12 @@ module {
 		#addPermission;
 		#removePermission;
 		#installCode;
-		#upgradeCode;
-		#uninstallCode;
 		#createCanister;
 		#startCanister;
 		#stopCanister;
 		#deleteCanister;
+		#removeOwner;
+		#appendOwner;
 	};
 
 	public func finish_proposer(p1: Proposal) : Proposal {
@@ -73,7 +77,7 @@ module {
   		}
 	};
 
-	public func update_canister_id(p1: Proposal, id: Canister) : Proposal {
+	public func update_canister_id(p1: Proposal, id: Principal) : Proposal {
 		{
 			id = p1.id;
 			proposer = p1.proposer;

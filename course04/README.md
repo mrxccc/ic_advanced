@@ -13,3 +13,9 @@ cd7qk-my6ce-anlh6-7wlh5-lw5ry-3ml6o-sjoqg-24cdj-fbryj-7sug2-cqe
 b3ybk-i3254-enljl-hi3ia-hm3d2-drsf4-y6xul-xdl4f-vxxu6-walfx-zqe
 ajsnu-kfj3b-eougo-6inua-herig-bjc4h-ywhap-s4mlm-t4sn5-eq366-vae
 dfx deploy --with-cycles=5000000000000 --argument '(2, vec {principal "cd7qk-my6ce-anlh6-7wlh5-lw5ry-3ml6o-sjoqg-24cdj-fbryj-7sug2-cqe"; principal "b3ybk-i3254-enljl-hi3ia-hm3d2-drsf4-y6xul-xdl4f-vxxu6-walfx-zqe"; principal "ajsnu-kfj3b-eougo-6inua-herig-bjc4h-ywhap-s4mlm-t4sn5-eq366-vae"})'
+
+
+call canister.propose(variant {upgradeCode}, opt canister_id, opt file "hello_2.wasm"); 
+https://github.com/chengshuzhi/ICCourseAdvanced/tree/master/course3/course3_homework/src/course3_homework 
+https://github.com/chenyan2002/ic-repl 
+https://mirror.xyz/seedao.eth/qaeXDDcz1iBvEf3ZsT1hfBX9GfOSfZ6xKMSpECWUPd4

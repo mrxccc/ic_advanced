@@ -9,6 +9,7 @@ import Principal "mo:base/Principal";
 import Text "mo:base/Text";
 import HashMap "mo:base/HashMap";
 import Cycles "mo:base/ExperimentalCycles";
+import Iter "mo:base/Iter";
 import IC "./ic";
 import Types "./types";
 
@@ -26,13 +27,14 @@ actor class(m: Nat, list: [Types.Owner]) = self {
     var N : Nat = ownerList.size();
 
     // 提案列表
-    var proposals : Buffer.Buffer<Proposal> = Buffer.Buffer<Proposal>(0);
-    var ownedCanisters : [Canister] = [];
+    var proposals :  HashMap.HashMap<ID, Proposal> =  HashMap.HashMap<Nat, Proposal>(0, func(x: ID,y: ID) {id == id});
+    // canisterId列表
+    var ownedCanisters :  HashMap.HashMap<Principal, Canister> =  HashMap.HashMap<Principal, Canister>(0, func(x: Principal,y: Principal) {x==y}, Principal.hash);
     // 对指定canister进行限权
-    var canisterPermissions : HashMap.HashMap<Canister, Bool> = HashMap.HashMap<Canister, Bool>(0, func(x: Canister,y: Canister) {x==y}, Principal.hash);
+    var canisterPermissions : HashMap.HashMap<Principal, Bool> = HashMap.HashMap<Principal, Bool>(0, func(x: Principal,y: Principal) {x==y}, Principal.hash);
 
     // 发起提案
-    public shared (msg) func propose(ptype: ProposalType,  canister_id: ?Canister, wasm_code: ?Blob, desc: Text) : async Proposal {
+    public shared (msg) func propose(ptype: ProposalType,  canister_id: ?Principal, wasm_code: ?Blob, desc: Text) : async Proposal {
         // caller should be one of the owners
         assert(owner_check(msg.caller));
 
@@ -47,10 +49,6 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         };
 
         if (ptype == #installCode) {
-            assert(Option.isSome(wasm_code));
-        };
-
-        if (ptype == #upgradeCode) {
             assert(Option.isSome(wasm_code));
         };
 
@@ -78,12 +76,12 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         Debug.print(debug_show(msg.caller, "PROPOSED", proposal.ptype, "Proposal ID", proposal.id));
         Debug.print(debug_show());
 
-        proposals.add(proposal);
+        proposals.put(proposal);
         proposal;
     };
 
     // 对提案进行投票
-    public shared (msg) func vote(id: ID) : async Proposal {
+    public shared (msg) func vote(id: ID) : async ?Proposal {
         // 消息调用者是否属于小组成员
         assert(owner_check(msg.caller));
 
@@ -91,7 +89,7 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         assert(id + 1 <= proposals.size());
 
         // 获取提案
-        var proposal = proposals.get(id);
+        var proposal = Option.get(proposals.get(id));
 
         // 提案是否完成
         assert(not proposal.finished);
@@ -125,7 +123,11 @@ actor class(m: Nat, list: [Types.Owner]) = self {
                     Cycles.add(1_000_000_000_000);
                     let result = await ic.create_canister({settings = ?settings});
                     let canister_id = result.canister_id;
-                    ownedCanisters := Array.append(ownedCanisters, [canister_id]);
+                    let canister : Canister = {
+                        id = canister_id;
+		                status = #stopped;
+                    };
+                    ownedCanisters.put(canister);
                     canisterPermissions.put(canister_id, true);
                     proposal := Types.update_canister_id(proposal, canister_id);
                 };
@@ -137,25 +139,6 @@ actor class(m: Nat, list: [Types.Owner]) = self {
                         arg = [];
                         wasm_module = Blob.toArray(Option.unwrap(proposal.wasm_code));
                         mode = #install;
-                        canister_id;
-                    });
-                };
-                case (#upgradeCode) {
-                    let canister_id = Option.unwrap(proposal.canisterId);
-
-                    Cycles.add(1_000_000_000_000);
-                    await ic.install_code({
-                        arg = [];
-                        wasm_module = Blob.toArray(Option.unwrap(proposal.wasm_code));
-                        mode = #upgrade;
-                        canister_id;
-                    });
-                };
-                case (#uninstallCode) {
-                    let canister_id = Option.unwrap(proposal.canisterId);
-
-                    Cycles.add(1_000_000_000_000);
-                    await ic.uninstall_code({
                         canister_id;
                     });
                 };
@@ -183,6 +166,12 @@ actor class(m: Nat, list: [Types.Owner]) = self {
                         canister_id;
                     });
                 };
+                case (#removeOwner) {
+                    appendOwner(proposal.canister_id);
+                };
+                case (#appendOwner) {
+                    removeOwner(proposal.canister_id);
+                };
             };
 
             proposal := Types.finish_proposer(proposal);
@@ -196,13 +185,13 @@ actor class(m: Nat, list: [Types.Owner]) = self {
     };
 
     // 拒绝提案
-    public shared (msg) func refuse(id: ID) : async Proposal {
+    public shared (msg) func refuse(id: ID) : async ?Proposal {
 
         assert(owner_check(msg.caller));
 
         assert(id + 1 <= proposals.size());
 
-        var proposal = proposals.get(id);
+        var proposal = Option.get(proposals.get(id));
 
         assert(not proposal.finished);
 
@@ -234,16 +223,16 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         Option.isSome(Array.find(ownerList, func (a: Owner) : Bool { Principal.equal(a, owner) }))
     };
 
-    func canister_check(canister : Canister) : Bool {
-        Option.isSome(Array.find(ownedCanisters, func (a: Canister) : Bool { Principal.equal(a, canister) }))
+    func canister_check(canister : Principal) : ?Canister {
+        ownedCanisters.get(canister)
     };
     
     public query func get_proposals() : async [Proposal] {
-        proposals.toArray()
+        Iter.toArray<Proposal>(proposals.vals());
     };
 
     public query func get_proposal(id: ID) : async ?Proposal {
-        proposals.getOpt(id)
+        proposals.get(id)
     };
 
     public query func get_owner_list() : async [Owner] {
@@ -251,14 +240,14 @@ actor class(m: Nat, list: [Types.Owner]) = self {
     };
 
     public query func get_owned_canisters_list() : async [Canister] {
-        ownedCanisters
+        Iter.toArray<Canister>(ownedCanisters.vals());
     };
 
     public query func get_model() : async (Nat, Nat) {
         (M, N)
     };
 
-    public query func get_permission(id: Canister) : async ?Bool {
+    public query func get_permission(id: Principal) : async ?Bool {
         canisterPermissions.get(id)
     };
 
@@ -269,4 +258,15 @@ actor class(m: Nat, list: [Types.Owner]) = self {
     public shared ({caller}) func getCanister() : async Principal {
         Principal.fromActor(self);
     };
+
+    func removeOwner(owner : Owner) : () {
+        ownerList := Array.filter<Principal>(ownerList, func (v) {not Principal.equal(v, owner)});
+        N := ownerList.size();
+    };
+
+    func appendOwner(owner : Owner) : () {
+        ownerList := Array.append(ownerList, [owner]);
+        N := ownerList.size();
+    };
+
 };

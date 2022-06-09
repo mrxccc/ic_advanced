@@ -8,12 +8,12 @@
                     <el-card v-for="proposal in proposalList" :key="proposal.id" class="box-card" style="width: 250px">
                         <template #header>
                             <div class="card-header">
-                                <span>{{proposal.description}}</span>
+                                <span>{{proposal.proposer}}</span>
                                 <el-button class="button" text>操作</el-button>
                             </div>
                         </template>
                         <el-descriptions
-                            :title="proposal.proposer"
+                            :title="proposal.description"
                             :column="2"
                             :size="size"
                             direction="horizontal"
