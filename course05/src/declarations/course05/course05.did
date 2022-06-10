@@ -1,57 +1,71 @@
-type anon_class_15_1 = 
+type canister_id = principal;
+type anon_class_17_1 = 
  service {
+   createCanister: () -> (canister_id);
+   deleteCanister: (principal) -> ();
    getCanister: () -> (principal);
    get_model: () -> (nat, nat) query;
-   get_owned_canisters_list: () -> (vec Canister__1) query;
+   get_owned_canisters_list: () -> (vec Canister) query;
    get_owner_list: () -> (vec Owner__1) query;
-   get_permission: (Canister__1) -> (opt bool) query;
+   get_permission: (principal) -> (bool) query;
    get_proposal: (ID) -> (opt Proposal) query;
    get_proposals: () -> (vec Proposal) query;
-   propose: (ProposalType__1, opt Canister__1, opt blob, text) -> (Proposal);
-   refuse: (ID) -> (Proposal);
+   greet: (text) -> (text) query;
+   installCode: (principal, blob) -> ();
+   propose: (ProposalType__1, opt principal, opt blob, text) -> (Proposal);
+   startCanister: (principal) -> ();
+   stopCanister: (principal) -> ();
    vote: (ID) -> (Proposal);
    whoami: () -> (principal) query;
  };
 type ProposalType__1 = 
  variant {
    addPermission;
+   appendOwner;
    createCanister;
    deleteCanister;
    installCode;
+   removeOwner;
    removePermission;
    startCanister;
    stopCanister;
-   uninstallCode;
-   upgradeCode;
  };
 type ProposalType = 
  variant {
    addPermission;
+   appendOwner;
    createCanister;
    deleteCanister;
    installCode;
+   removeOwner;
    removePermission;
    startCanister;
    stopCanister;
-   uninstallCode;
-   upgradeCode;
  };
 type Proposal = 
  record {
    approvers: vec Owner;
-   canisterId: opt Canister;
+   canisterId: opt principal;
    description: text;
    finished: bool;
    id: ID__1;
    proposer: Owner;
    ptype: ProposalType;
-   refusers: vec Owner;
    wasm_code: opt blob;
  };
 type Owner__1 = principal;
 type Owner = principal;
 type ID__1 = nat;
 type ID = nat;
-type Canister__1 = principal;
-type Canister = principal;
-service : (nat, vec Owner) -> anon_class_15_1
+type CanisterStatus = 
+ variant {
+   running;
+   stopped;
+   stopping;
+ };
+type Canister = 
+ record {
+   id: principal;
+   status: CanisterStatus;
+ };
+service : (nat, vec Owner) -> anon_class_17_1

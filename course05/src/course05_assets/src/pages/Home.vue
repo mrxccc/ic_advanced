@@ -45,30 +45,34 @@
             </el-main>
         </el-container>
     </div>
-    
-    <route-view/>
 </template>
 
 <script>
-import { course05 } from "../../../declarations/course05";
-import { onMounted,reactive,ref  } from "vue";
+import { course05, idlFactory, canisterId as main_canister_id } from "../../../declarations/course05";
+import { onMounted,reactive,ref,computed  } from "vue";
 import { Actor, HttpAgent } from "@dfinity/agent";
 import { DelegationIdentity } from "@dfinity/identity";
 import { AuthClient } from "@dfinity/auth-client";
 import { Principal } from "@dfinity/principal";
 import { useRouter } from 'vue-router';
-import useClipboard from 'vue-clipboard3'
-
+import useClipboard from 'vue-clipboard3';
+import { useStore } from 'vuex'
 export default {
     
     setup () {
         const activeIndex = ref('1')
         const activeIndex2 = ref('1')
-        const isLogin = ref(false)
+        const store  = useStore()
+        const isLogin = computed(() =>{
+            console.log(store.state.isLogin)
+            return store.state.isLogin
+        })
         const router = useRouter()
         const { toClipboard } = useClipboard()
         var authClient = {}
-        const principalId = ref('')
+        const principalId = computed(() =>{
+            return store.state.principalId
+        })
         const handleSelect = (key, keyPath) => {
             switch (key) {
                 case '0': router.push('/home');console.log(0); break;
@@ -82,15 +86,21 @@ export default {
         });
         const updateView = () => {
             const identity = authClient.getIdentity();
-            console.log(identity)
-            console.log(identity.getPrincipal().toText())
-            console.log(principalId)
             if (identity instanceof DelegationIdentity) {
-                principalId.value = identity.getPrincipal().toText()
-                isLogin.value = true;
+                const agent = new HttpAgent({ identity });
+                // 设置代理
+                var webapp = Actor.createActor(idlFactory, {
+                    agent,
+                    canisterId: main_canister_id,
+                });
+                console.log(webapp)
+                store.dispatch('updateLoginStatus', true)
+                store.dispatch('updateWebApp', webapp)
+                store.dispatch('updatePrincipalId', identity.getPrincipal().toText())
             } else {
-                principalId.value = identity.getPrincipal().toText()
-                isLogin.value = false;
+                store.dispatch('updateLoginStatus', false)
+                store.dispatch('updateWebApp', {})
+                store.dispatch('updatePrincipalId', identity.getPrincipal().toText())
             }
         }
         const copy = async () => {

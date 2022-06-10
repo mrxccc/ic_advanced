@@ -36,15 +36,23 @@
 
 <script>
 
-import { ref,toRefs,reactive,onMounted } from 'vue'
+import { ref,toRefs,reactive,onMounted,computed } from 'vue'
 import { course05 } from "../../../declarations/course05";
 import useClipboard from 'vue-clipboard3'
+import { useStore } from 'vuex'
 export default {
    setup(){
         const fill = ref(true)
         const loading = reactive({
             proposalsLoading: false,
         });
+        const store  = useStore()
+        const isLogin = computed(() =>{
+                return store.state.isLogin
+        })
+        const webapp = computed(() =>{
+                return store.state.webapp
+        })
         const { toClipboard } = useClipboard()
         const ProposalType = {
             installCode: 1,

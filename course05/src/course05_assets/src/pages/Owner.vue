@@ -1,54 +1,61 @@
 <template>
-    <el-row>
-        <el-col :span="8"><div class="grid-content ep-bg-purple" /></el-col>
-        <el-col :span="8"><div class="grid-content ep-bg-purple-light" />
-            <el-space :fill="fill" wrap
-                    :direction="direction"
-                    style="width: 30%;display: table-cell;vertical-align: middle;text-align:center;">
-                    <el-card v-for="i in 2" :key="i" class="box-card" style="width: 250px">
-                    <template #header>
-                        <div class="card-header">
-                        <span>Card name</span>
-                        <el-button class="button" text>Operation button</el-button>
-                        </div>
-                    </template>
-                    <div v-for="o in 4" :key="o" class="text item">
-                        {{ 'List item ' + o }}
-                    </div>
-                    </el-card>
-            </el-space>
-        </el-col>
-        <el-col :span="8"><div class="grid-content ep-bg-purple" /></el-col>
-    </el-row>
+  <el-row>
+      <el-col :span="2"><div class="grid-content ep-bg-purple" /></el-col>
+      <el-col :span="20"><div class="grid-content ep-bg-purple-light" />
+        <el-table :data="ownerList" style="width: 100%" stripe  >
+          <el-table-column prop="principalId" label="principalId"/>
+        </el-table>
+      </el-col>
+      <el-col :span="2"><div class="grid-content ep-bg-purple" /></el-col>
+  </el-row>
 </template>
 
 <script>
 
-import { ref } from 'vue'
+import { ref,toRefs,reactive,onMounted,computed } from 'vue'
+import { course05 } from "../../../declarations/course05";
+import { useStore } from 'vuex'
 export default {
-   setup(){
-       const fill = ref(true)
-       return {fill}
-   }
+ setup(){
+      const fill = ref(true)
+      const loading = reactive({
+        ownerLoading: false,
+      });
+      const data = reactive({
+        ownerList: [],
+      });
+      const store  = useStore()
+      const isLogin = computed(() =>{
+            return store.state.isLogin
+      })
+      const webapp = computed(() =>{
+            return store.state.webapp
+      })
+      const methods = {
+        getOwners() {
+          loading.ownerLoading = true
+            course05.get_owner_list().then((owners) => {
+                console.log(owners)
+                var ownerList = []
+                var keyIndex = 1
+                for (const id of owners) {
+                    ownerList.push({principalId: id.toText(),})
+                }
+                data.ownerList = ownerList
+                loading.ownerLoading = false
+            }).catch((err) => {
+                console.log(err)
+                loading.ownerLoading = false
+            });
+        },
+      }
+      onMounted(() => {
+            methods.getOwners()
+      });
+      return {fill,...toRefs(data),...toRefs(loading)}
+ }
 }
 </script>
 
 <style>
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.text {
-  font-size: 14px;
-}
-
-.item {
-  margin-bottom: 18px;
-}
-
-.box-card {
-  width: 480px;
-}
 </style>

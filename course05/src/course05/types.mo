@@ -9,7 +9,7 @@ module {
 		id: Principal;
 		status: CanisterStatus;
 	};
-	public type  ID = Nat;
+	public type ID = Nat;
 
 	public type Proposal = {
 		id: ID; // 提案id
@@ -18,7 +18,6 @@ module {
 		ptype: ProposalType; // 提案类型
 		canisterId: ?Principal; // 提案指定的canister_id，如果是installCode或者upgradeCode，为空
 		approvers: [Owner]; // 提案同意成员
-		refusers: [Owner]; // 提案拒绝成员
 		finished: Bool; // 提案完成状态
 		description: Text;// 提案描述
 	};
@@ -43,7 +42,6 @@ module {
 			ptype = p1.ptype;
 			canisterId = p1.canisterId;
 			approvers = p1.approvers;
-			refusers = p1.refusers;
 			finished = true;
 			description = p1.description;
   		}
@@ -57,13 +55,12 @@ module {
 			ptype = p1.ptype;
 			canisterId = p1.canisterId;
 			approvers = Array.append(p1.approvers, [approver]);
-            refusers = p1.refusers;
 			finished = p1.finished;
 			description = p1.description;
   		}
 	};
 
-	public func add_refuser(p1: Proposal, refuser: Owner) : Proposal {
+	public func add_refuser(p1: Proposal) : Proposal {
 		{
 			id = p1.id;
 			proposer = p1.proposer;
@@ -71,7 +68,6 @@ module {
 			ptype = p1.ptype;
 			canisterId = p1.canisterId;
 			approvers = p1.approvers;
-            refusers = Array.append(p1.refusers, [refuser]);
 			finished = p1.finished;
 			description = p1.description;
   		}
@@ -85,7 +81,6 @@ module {
 			ptype = p1.ptype;
 			canisterId = ?id;
 			approvers = p1.approvers;
-			refusers = p1.refusers;
 			finished = p1.finished;
 			description = p1.description;
 		}
