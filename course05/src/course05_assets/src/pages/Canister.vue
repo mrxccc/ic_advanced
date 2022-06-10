@@ -90,7 +90,7 @@ export default {
         },
         handleStart(index,row){
           loading.canisterLoading = true
-          webapp.startCanister(Principal.fromText(row.canisterId)).then((canisters) => {
+          store.state.webapp.startCanister(Principal.fromText(row.canisterId)).then((canisters) => {
               getCanisters()
           }).catch((err) => {
               console.log(err)
@@ -101,7 +101,7 @@ export default {
         },
         handleStop(index,row){
           loading.canisterLoading = true
-          webapp.stopCanister(Principal.fromText(row.canisterId)).then(() => {
+          store.state.webapp.stopCanister(Principal.fromText(row.canisterId)).then(() => {
               getCanisters()
           }).catch((err) => {
               console.log(err)
@@ -112,7 +112,7 @@ export default {
         },
         handleDelete(index,row){
           loading.canisterLoading = true
-          webapp.deleteCanister(Principal.fromText(row.canisterId)).then(() => {
+          store.state.webapp.deleteCanister(Principal.fromText(row.canisterId)).then(() => {
               getCanisters()
           }).catch((err) => {
               console.log(err)
@@ -123,7 +123,8 @@ export default {
         },
         createCanister(){
           loading.canisterLoading = true
-          webapp.createCanister().then((canisters) => {
+          console.log(store.state.webapp)
+          store.state.webapp.createCanister().then((canisters) => {
               getCanisters()
           }).catch((err) => {
               console.log(err)

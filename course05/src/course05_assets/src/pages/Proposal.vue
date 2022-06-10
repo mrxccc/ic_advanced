@@ -51,6 +51,7 @@ export default {
                 return store.state.isLogin
         })
         const webapp = computed(() =>{
+                console.log("store.state.webapp", store.state.webapp)
                 return store.state.webapp
         })
         const { toClipboard } = useClipboard()
@@ -111,7 +112,7 @@ export default {
                 });
             },
             vote(id){
-                course05.vote(id).then((proposals) => {
+                store.state.webapp.vote(id).then((proposals) => {
                     getProposals()
                 }).catch((err) => {
                     console.log(err)

@@ -231,19 +231,6 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         await start_canister(canister_id);
     };
 
-    
-    system func heartbeat() : async () {
-        let ic : IC.Self = actor("aaaaa-aa");
-        for( canister_id in ownedCanisters.keys()) {
-            try {
-                let result = await ic.canister_status({canister_id});
-                ownedCanisters.put(canister_id, {id = canister_id; status = result.status});
-            } catch e {
-                Debug.print(debug_show(Error.message(e)));
-            }
-        }
-    };
-
 
     func owner_check(owner : Owner) : Bool {
         Option.isSome(Array.find(ownerList, func (a: Owner) : Bool { Principal.equal(a, owner) }))
