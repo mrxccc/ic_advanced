@@ -1,5 +1,6 @@
 export const idlFactory = ({ IDL }) => {
   const Owner = IDL.Principal;
+  const Owner__1 = IDL.Principal;
   const canister_id = IDL.Principal;
   const CanisterStatus = IDL.Variant({
     'stopped' : IDL.Null,
@@ -10,7 +11,6 @@ export const idlFactory = ({ IDL }) => {
     'id' : IDL.Principal,
     'status' : CanisterStatus,
   });
-  const Owner__1 = IDL.Principal;
   const ID = IDL.Nat;
   const ID__1 = IDL.Nat;
   const ProposalType = IDL.Variant({
@@ -45,7 +45,8 @@ export const idlFactory = ({ IDL }) => {
     'createCanister' : IDL.Null,
     'deleteCanister' : IDL.Null,
   });
-  const anon_class_17_1 = IDL.Service({
+  const anon_class_18_1 = IDL.Service({
+    'append_Owner' : IDL.Func([Owner__1], [], []),
     'createCanister' : IDL.Func([], [canister_id], []),
     'deleteCanister' : IDL.Func([IDL.Principal], [], []),
     'getCanister' : IDL.Func([], [IDL.Principal], []),
@@ -53,7 +54,7 @@ export const idlFactory = ({ IDL }) => {
     'get_owned_canisters_list' : IDL.Func([], [IDL.Vec(Canister)], ['query']),
     'get_owner_list' : IDL.Func([], [IDL.Vec(Owner__1)], ['query']),
     'get_permission' : IDL.Func([IDL.Principal], [IDL.Bool], ['query']),
-    'get_proposal' : IDL.Func([ID], [IDL.Opt(Proposal)], ['query']),
+    'get_proposal' : IDL.Func([ID], [Proposal], ['query']),
     'get_proposals' : IDL.Func([], [IDL.Vec(Proposal)], ['query']),
     'greet' : IDL.Func([IDL.Text], [IDL.Text], ['query']),
     'installCode' : IDL.Func([IDL.Principal, IDL.Vec(IDL.Nat8)], [], []),
@@ -67,12 +68,13 @@ export const idlFactory = ({ IDL }) => {
         [Proposal],
         [],
       ),
+    'remove_Owner' : IDL.Func([Owner__1], [], []),
     'startCanister' : IDL.Func([IDL.Principal], [], []),
     'stopCanister' : IDL.Func([IDL.Principal], [], []),
     'vote' : IDL.Func([ID], [Proposal], []),
     'whoami' : IDL.Func([], [IDL.Principal], ['query']),
   });
-  return anon_class_17_1;
+  return anon_class_18_1;
 };
 export const init = ({ IDL }) => {
   const Owner = IDL.Principal;

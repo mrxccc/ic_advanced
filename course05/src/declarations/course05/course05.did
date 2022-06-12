@@ -1,6 +1,7 @@
 type canister_id = principal;
-type anon_class_17_1 = 
+type anon_class_18_1 = 
  service {
+   append_Owner: (Owner__1) -> ();
    createCanister: () -> (canister_id);
    deleteCanister: (principal) -> ();
    getCanister: () -> (principal);
@@ -8,11 +9,12 @@ type anon_class_17_1 =
    get_owned_canisters_list: () -> (vec Canister) query;
    get_owner_list: () -> (vec Owner__1) query;
    get_permission: (principal) -> (bool) query;
-   get_proposal: (ID) -> (opt Proposal) query;
+   get_proposal: (ID) -> (Proposal) query;
    get_proposals: () -> (vec Proposal) query;
    greet: (text) -> (text) query;
    installCode: (principal, blob) -> ();
    propose: (ProposalType__1, opt principal, opt blob, text) -> (Proposal);
+   remove_Owner: (Owner__1) -> ();
    startCanister: (principal) -> ();
    stopCanister: (principal) -> ();
    vote: (ID) -> (Proposal);
@@ -68,4 +70,4 @@ type Canister =
    id: principal;
    status: CanisterStatus;
  };
-service : (nat, vec Owner) -> anon_class_17_1
+service : (nat, vec Owner) -> anon_class_18_1

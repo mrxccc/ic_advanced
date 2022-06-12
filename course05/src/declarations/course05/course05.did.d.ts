@@ -35,7 +35,8 @@ export type ProposalType__1 = { 'stopCanister' : null } |
   { 'removePermission' : null } |
   { 'createCanister' : null } |
   { 'deleteCanister' : null };
-export interface anon_class_17_1 {
+export interface anon_class_18_1 {
+  'append_Owner' : (arg_0: Owner__1) => Promise<undefined>,
   'createCanister' : () => Promise<canister_id>,
   'deleteCanister' : (arg_0: Principal) => Promise<undefined>,
   'getCanister' : () => Promise<Principal>,
@@ -43,7 +44,7 @@ export interface anon_class_17_1 {
   'get_owned_canisters_list' : () => Promise<Array<Canister>>,
   'get_owner_list' : () => Promise<Array<Owner__1>>,
   'get_permission' : (arg_0: Principal) => Promise<boolean>,
-  'get_proposal' : (arg_0: ID) => Promise<[] | [Proposal]>,
+  'get_proposal' : (arg_0: ID) => Promise<Proposal>,
   'get_proposals' : () => Promise<Array<Proposal>>,
   'greet' : (arg_0: string) => Promise<string>,
   'installCode' : (arg_0: Principal, arg_1: Array<number>) => Promise<
@@ -55,10 +56,11 @@ export interface anon_class_17_1 {
       arg_2: [] | [Array<number>],
       arg_3: string,
     ) => Promise<Proposal>,
+  'remove_Owner' : (arg_0: Owner__1) => Promise<undefined>,
   'startCanister' : (arg_0: Principal) => Promise<undefined>,
   'stopCanister' : (arg_0: Principal) => Promise<undefined>,
   'vote' : (arg_0: ID) => Promise<Proposal>,
   'whoami' : () => Promise<Principal>,
 }
 export type canister_id = Principal;
-export interface _SERVICE extends anon_class_17_1 {}
+export interface _SERVICE extends anon_class_18_1 {}

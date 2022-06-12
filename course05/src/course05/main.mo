@@ -1,17 +1,18 @@
 import Array "mo:base/Array";
-import Error "mo:base/Error";
-import Buffer "mo:base/Buffer";
-import Debug "mo:base/Debug";
 import Blob "mo:base/Blob";
+import Bool "mo:base/Bool";
+import Buffer "mo:base/Buffer";
+import Cycles "mo:base/ExperimentalCycles";
+import Debug "mo:base/Debug";
+import Error "mo:base/Error";
+import Hash "mo:base/Hash";
+import HashMap "mo:base/HashMap";
+import IC "./ic";
+import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
 import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
-import HashMap "mo:base/HashMap";
-import Hash "mo:base/Hash";
-import Cycles "mo:base/ExperimentalCycles";
-import Iter "mo:base/Iter";
-import IC "./ic";
 import Types "./types";
 
 actor class(m: Nat, list: [Types.Owner]) = self {
@@ -28,7 +29,7 @@ actor class(m: Nat, list: [Types.Owner]) = self {
     var N : Nat = ownerList.size();
 
     // 提案列表
-    var proposals :  HashMap.HashMap<ID, Proposal> =  HashMap.HashMap<ID, Proposal>(0, func(x: ID,y: ID) {x == y}, Hash.hash);
+    var proposals : Buffer.Buffer<Proposal> = Buffer.Buffer<Proposal>(0);
     // canisterId列表
     var ownedCanisters :  HashMap.HashMap<Principal, Canister> =  HashMap.HashMap<Principal, Canister>(0, func(x: Principal,y: Principal) {x == y}, Principal.hash);
     // 对指定canister进行限权
@@ -44,7 +45,7 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         };
 
         if (ptype != #createCanister) {
-            assert(Option.isSome(canister_id));
+            assert(Option.isSome(canister_id))
         };
 
         let canisterId : Principal = Option.unwrap(canister_id);
@@ -64,7 +65,7 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         Debug.print(debug_show(msg.caller, "PROPOSED", proposal.ptype, "Proposal ID", proposal.id));
         Debug.print(debug_show());
 
-        proposals.put(proposals.size(), proposal);
+        proposals.add(proposal);
         proposal;
     };
 
@@ -74,10 +75,10 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         assert(owner_check(msg.caller));
 
         // 提案id是否存在
-        assert(Option.isNull(proposals.get(id)));
+        assert(id + 1 <= proposals.size());
 
         // 获取提案
-        var proposal = Option.unwrap(proposals.get(id));
+        var proposal = proposals.get(id);
 
         // 提案是否完成
         assert(not proposal.finished);
@@ -116,10 +117,10 @@ actor class(m: Nat, list: [Types.Owner]) = self {
                     await delete_canister(canisterId);
                 };
                 case (#removeOwner) {
-                    appendOwner(canisterId);
+                    removeOwner(canisterId);
                 };
                 case (#appendOwner) {
-                    removeOwner(canisterId);
+                    appendOwner(canisterId)
                 };
             };
 
@@ -130,7 +131,7 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         Debug.print(debug_show());
 
         proposals.put(id, proposal);
-        proposal
+        proposals.get(id)
     };
 
     // 创建canister
@@ -157,13 +158,13 @@ actor class(m: Nat, list: [Types.Owner]) = self {
     public shared (msg) func createCanister() : async IC.canister_id {
         // caller should be one of the owners
         assert(owner_check(msg.caller));
-        await create_canister();
+        let result = await create_canister();
+        return result
     };
 
     // 删除canister
     func delete_canister(canister_id : Principal) : async () {
         let ic : IC.Self = actor("aaaaa-aa");
-        Cycles.add(1_000_000_000_000);
         await ic.delete_canister({
             canister_id;
         });
@@ -174,13 +175,12 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         // caller should be one of the owners
         assert(owner_check(msg.caller));
         assert(Option.isSome(canister_check(canister_id)));
-        assert(canisterPermissions.get(canister_id) == ?false);
+        assert(canisterPermissions.get(canister_id) == ?true);
         await delete_canister(canister_id);
     };
 
     // install code
     func install_code(canisterId : Principal, wasm_code: Blob) : async () {
-        Cycles.add(1_000_000_000_000);
         let ic : IC.Self = actor("aaaaa-aa");
         await ic.install_code({
             arg = [];
@@ -193,7 +193,7 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         // caller should be one of the owners
         assert(owner_check(msg.caller));
         assert(Option.isSome(canister_check(canister_id)));
-        assert(canisterPermissions.get(canister_id) == ?false);
+        assert(canisterPermissions.get(canister_id) == ?true);
         await install_code(canister_id, wasm_code);
     };
 
@@ -201,7 +201,6 @@ actor class(m: Nat, list: [Types.Owner]) = self {
     // 停止canister
     func stop_canister(canister_id : Principal) : async (){
         let ic : IC.Self = actor("aaaaa-aa");
-        Cycles.add(1_000_000_000_000);
         await ic.stop_canister({
             canister_id;
         });
@@ -210,7 +209,7 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         // caller should be one of the owners
         assert(owner_check(msg.caller));
         assert(Option.isSome(canister_check(canister_id)));
-        assert(canisterPermissions.get(canister_id) == ?false);
+        assert(canisterPermissions.get(canister_id) == ?true);
         await stop_canister(canister_id);
     };
 
@@ -218,7 +217,6 @@ actor class(m: Nat, list: [Types.Owner]) = self {
     // 开始canister
     func start_canister(canister_id : Principal) : async (){
         let ic : IC.Self = actor("aaaaa-aa");
-        Cycles.add(1_000_000_000_000);
         await ic.start_canister({
             canister_id;
         });
@@ -227,13 +225,13 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         // caller should be one of the owners
         assert(owner_check(msg.caller));
         assert(Option.isSome(canister_check(canister_id)));
-        assert(canisterPermissions.get(canister_id) == ?false);
+        assert(canisterPermissions.get(canister_id) == ?true);
         await start_canister(canister_id);
     };
 
 
     func owner_check(owner : Owner) : Bool {
-        Option.isSome(Array.find(ownerList, func (a: Owner) : Bool { Principal.equal(a, owner) }))
+        return Option.isSome(Array.find(ownerList, func (a: Owner) : Bool { Principal.equal(a, owner) }));
     };
 
     func canister_check(canister : Principal) : ?Canister {
@@ -244,7 +242,7 @@ actor class(m: Nat, list: [Types.Owner]) = self {
         Iter.toArray<Proposal>(proposals.vals());
     };
 
-    public query func get_proposal(id: ID) : async ?Proposal {
+    public query func get_proposal(id: ID) : async Proposal {
         proposals.get(id)
     };
 
@@ -261,7 +259,7 @@ actor class(m: Nat, list: [Types.Owner]) = self {
     };
 
     public query func get_permission(canister_id: Principal) : async Bool {
-        canisterPermissions.get(canister_id) == ?false
+        canisterPermissions.get(canister_id) == ?true
     };
 
     public shared query ({caller}) func whoami() : async Principal {
@@ -278,6 +276,16 @@ actor class(m: Nat, list: [Types.Owner]) = self {
     };
 
     func appendOwner(owner : Owner) : () {
+        ownerList := Array.append(ownerList, [owner]);
+        N := ownerList.size();
+    };
+
+    public shared func remove_Owner(owner : Owner) : async () {
+        ownerList := Array.filter<Principal>(ownerList, func (v) {not Principal.equal(v, owner)});
+        N := ownerList.size();
+    };
+
+    public shared func append_Owner(owner : Owner) : async () {
         ownerList := Array.append(ownerList, [owner]);
         N := ownerList.size();
     };

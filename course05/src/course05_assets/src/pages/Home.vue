@@ -64,7 +64,6 @@ export default {
         const activeIndex2 = ref('1')
         const store  = useStore()
         const isLogin = computed(() =>{
-            console.log(store.state.isLogin)
             return store.state.isLogin
         })
         const router = useRouter()
@@ -75,10 +74,10 @@ export default {
         })
         const handleSelect = (key, keyPath) => {
             switch (key) {
-                case '0': router.push('/home');console.log(0); break;
-                case '1': router.push('/proposal');console.log(1); break;
-                case '2': router.push('/canister');console.log(2); break;
-                case '3': router.push('/owner');console.log(3); break;
+                case '0': router.push('/home'); break;
+                case '1': router.push('/proposal'); break;
+                case '2': router.push('/canister'); break;
+                case '3': router.push('/owner'); break;
             }
         }
         onMounted(async () => {
@@ -86,6 +85,7 @@ export default {
         });
         const updateView = () => {
             const identity = authClient.getIdentity();
+            
             if (identity instanceof DelegationIdentity) {
                 const agent = new HttpAgent({ identity });
                 // 设置代理
@@ -93,7 +93,6 @@ export default {
                     agent,
                     canisterId: main_canister_id,
                 });
-                console.log(webapp)
                 store.dispatch('updateLoginStatus', true)
                 store.dispatch('updateWebApp', webapp)
                 store.dispatch('updatePrincipalId', identity.getPrincipal().toText())
@@ -124,9 +123,9 @@ export default {
                         onSuccess: async () => {
                             updateView()
                         },
-                    // identityProvider:process.env.DFX_NETWORK === "ic" ? "https://identity.ic0.app/#authorize": //线上internet identity canister ID
-                    // "http://rrkah-fqaaa-aaaaa-aaaaq-cai.localhost:8000/#authorize",//本地internet identity canister ID
-                    identityProvider: "https://identity.ic0.app/#authorize",//本地internet identity canister ID
+                    identityProvider:process.env.DFX_NETWORK === "ic" ? "https://identity.ic0.app/#authorize": //线上internet identity canister ID
+                    "http://rkp4c-7iaaa-aaaaa-aaaca-cai.localhost:8000/#authorize",//本地internet identity canister ID
+                    // identityProvider: "https://identity.ic0.app/#authorize",//本地internet identity canister ID
                     //最大授权有效期为8天
                     maxTimeToLive: days * hours * nanoseconds,
                 })

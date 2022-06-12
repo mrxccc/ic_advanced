@@ -5,6 +5,17 @@ const state = {
     webapp: {},
     principalId: "",
 }
+const getters = {
+    getWebapp: state => {
+        return state.webapp
+    },
+    getIsLogin: state => {
+        return state.isLogin
+    },
+    getprincipalId: state => {
+        return state.principalId
+    }
+}
 
 //创建mutataions
 const mutations = {
@@ -22,23 +33,22 @@ const mutations = {
 //创建actions
 const actions = {
     updateLoginStatus(store, login){
-        console.log("login", login)
         store.commit('updateLoginStatus', login)
     },
     updatePrincipalId(store, principalId){
         store.commit('updatePrincipalId', principalId)
     },
     updateWebApp(store, webApp){
-        console.log("loging")
         store.commit('updateWebApp', webApp)
     }
 }
 
 //创建store
 const store = createStore({
-state,
-actions,
-mutations
+    state,
+    getters,
+    actions,
+    mutations
 })
 //暴露出去
 export default store

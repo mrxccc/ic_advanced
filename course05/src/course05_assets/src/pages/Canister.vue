@@ -61,19 +61,13 @@ export default {
           }
       }
       const store  = useStore()
-      const isLogin = computed(() =>{
-            return store.state.isLogin
-      })
-      const webapp = computed(() =>{
-            console.log(store.state.webapp)
-            return store.state.webapp.CanisterActor
-      })
       const data = reactive({
         canisterList: [],
       });
       const methods = {
         getCanisters() {
-          loading.canisterLoading = true
+            loading.canisterLoading = true
+            console.log(store)
             course05.get_owned_canisters_list().then((canisters) => {
                 console.log(canisters)
                 var canistersList = []
@@ -87,6 +81,9 @@ export default {
                 console.log(err)
                 loading.canisterLoading = false
             });
+        },
+        updateCanistersStatus() {
+          // await createActor(store.state.).get_name()
         },
         handleStart(index,row){
           loading.canisterLoading = true
@@ -123,7 +120,6 @@ export default {
         },
         createCanister(){
           loading.canisterLoading = true
-          console.log(store.state.webapp)
           store.state.webapp.createCanister().then((canisters) => {
               getCanisters()
           }).catch((err) => {
