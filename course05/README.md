@@ -1,10 +1,10 @@
 # course05
 
 # 示例：
-![图片](img/1.jpg)
-![图片](img/2.jpg)
-![图片](img/3.jpg)
-![图片](img/4.jpg)
+![图片](img/1.png)
+![图片](img/2.png)
+![图片](img/3.png)
+![图片](img/4.png)
 # deploy命令
 cd7qk-my6ce-anlh6-7wlh5-lw5ry-3ml6o-sjoqg-24cdj-fbryj-7sug2-cqe
 vsyhq-akc5g-dv6r5-egp32-ylr2k-whhrg-acmem-6tn5d-hd5pk-bnnix-gae
